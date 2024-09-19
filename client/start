@@ -1,0 +1,28 @@
+#!/bin/sh
+
+if test "$CERT" != ""; then
+    echo "$CERT"|sed -e 's/\\n/\n/g' >/tmp/cert.pem
+    CERTFILE=/tmp/cert.pem
+fi
+
+if test "$KEY" != ""; then
+    echo "$KEY"|sed -e 's/\\n/\n/g' >/tmp/key.pem
+    KEYFILE=/tmp/key.pem
+fi
+
+if test "$CACERT" != ""; then
+    echo "$CACERT"|sed -e 's/\\n/\n/g' >/tmp/ca.pem
+    CAFILE=/tmp/ca.pem
+fi
+
+# socat 'TCP-LISTEN:3000,fork,retry' 'OPENSSL:192.168.100.96:4000,certificate=/home/yadd/dev/ci-linagora/mail-gov-mauritius/certificates/pki/issued/sso.govmu.org_sn.crt,key=/home/yadd/dev/ci-linagora/mail-gov-mauritius/certificates/pki/private/sso.govmu.org.key,verify=0,openssl-no-sni,openssl-commonname=""'
+DSTSTRING="OPENSSL:${DST},certificate=${CERTFILE},key=${KEYFILE},verify=${VERIFY},openssl-no-sni,openssl-commonname="'""'
+
+if test "$CAPATH" != ""; then
+    DSTSTRING="${DSTSTRING},capath=${CAPATH}"
+elif test "$CAFILE" != ""; then
+    DSTSTRING="${DSTSTRING},cafile=${CAFILE}"
+fi
+
+echo socat "'TCP-LISTEN:${PORT},fork,retry'" "'$DSTSTRING'"
+socat "TCP-LISTEN:${PORT},fork,retry" "$DSTSTRING"

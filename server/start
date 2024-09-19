@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if test "$CERT" != ""; then
+    echo "$CERT"|sed -e 's/\\n/\n/g' >/tmp/cert.pem
+    CERTFILE=/tmp/cert.pem
+fi
+
+if test "$KEY" != ""; then
+    echo "$KEY"|sed -e 's/\\n/\n/g' >/tmp/key.pem
+    KEYFILE=/tmp/key.pem
+fi
+
+if test "$CACERT" != ""; then
+    echo "$CACERT"|sed -e 's/\\n/\n/g' >/tmp/ca.pem
+    CAFILE=/tmp/ca.pem
+fi
+
+SERVERSTRING="OPENSSL-LISTEN:${PORT},fork,certificate=${CERTFILE},key=${KEYFILE},verify=${VERIFY},retry"
+
+if test "$CAPATH" != ""; then
+    SERVERSTRING="${SERVERSTRING},capath=${CAPATH}"
+elif test "$CAFILE" != ""; then
+    SERVERSTRING="${SERVERSTRING},cafile=${CAFILE}"
+fi
+
+echo socat "'$SERVERSTRING'" "'TCP:${DST}'"
+socat "$SERVERSTRING" "TCP:${DST}"
