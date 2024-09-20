@@ -1,0 +1,34 @@
+services:
+  client:
+    image: socat-client-test
+    build:
+      context: client
+      dockerfile: ./Dockerfile
+    environment:
+      - PORT=3000
+      - "DST=server:4000"
+      - CAFILE=/cert.pem
+    volumes:
+      - ./ssl/cert.pem:/cert.pem
+      - ./ssl/key.pem:/key.pem
+    ports:
+      - 3000:3000
+
+  server:
+    image: socat-server-test
+    build:
+      context: server
+      dockerfile: ./Dockerfile
+    environment:
+      - PORT=4000
+      - "DST=hidden:3000"
+      - CAFILE=/cert.pem
+    volumes:
+      - ./ssl/cert.pem:/cert.pem
+      - ./ssl/key.pem:/key.pem
+
+  hidden:
+    image: socat-static-server-test
+    build:
+      context: test-static
+      dockerfile: ./Dockerfile
