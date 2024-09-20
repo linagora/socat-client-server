@@ -1,6 +1,5 @@
 services:
   client:
-    image: socat-client-test
     build:
       context: client
       dockerfile: ./Dockerfile
@@ -15,7 +14,6 @@ services:
       - 3000:3000
 
   server:
-    image: socat-server-test
     build:
       context: server
       dockerfile: ./Dockerfile
@@ -28,7 +26,6 @@ services:
       - ./ssl/key.pem:/key.pem
 
   hidden:
-    image: socat-static-server-test
     build:
       context: test-static
       dockerfile: ./Dockerfile
